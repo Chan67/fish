@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,  minimum-scale=1.0, maximum-scale=2.0,user-scalable=no" />
+    <title>深海捕鱼赢好礼!</title>
+    <link href="css/reset.css" rel="stylesheet" type="text/css" />
+    <link href="css/game.css" rel="stylesheet" type="text/css" />
+    <script src="js/jquery-2.1.1.min.js"></script>
+</head>
+
+<body>
+    <canvas id="canvas">
+        您的浏览器太low了！
+    </canvas>
+    <div id="credits" class="score">0</div>
+    <div id="time" class="time">加载..</div>
+    
+    <script>
+    function loadImg(arr, fn) {
+        var result = {};
+        var iNow = 0;
+        for (var i = 0; i < arr.length; i++) {
+            var oImage = new Image();
+            var tmp = arr[i].split('.');
+            result[tmp[0]] = oImage;
+            oImage.onload = function() {
+                iNow++;
+                if (iNow >= arr.length) {
+                    fn(result);
+                }
+            }
+            oImage.src = 'Images/' + arr[i];
+        }
+    }
+    window.onload = function() {
+        var oCans = document.getElementById('canvas');
+        var curW = document.documentElement.clientWidth || document.body.clientWidth;
+        var curH = document.documentElement.clientHeight || document.body.clientHeight;
+        var integral = '0';
+        var integralArr = getInteger(0);
+        var i = 0;
+        oCans.width = curW;
+        oCans.height = curH - 5;
+        var DrawingInterval;
+        var oGc = oCans.getContext('2d');
+        loadImg(['pig.png', 'gun.png', 'bullet.png', 'gold.png', 'fish1.png', 'fish1_1.png', 'fish2.png', 'fish2_1.png', 'fish3.png', 'fish3_1.png', 'integer.png', 'bottom.jpg'], function(result) {
+            //炮的运动
+            oGc.drawImage(result['gun'], 0, 0, 64, 64, oCans.offsetWidth / 2 - 32, oCans.offsetHeight - 70, 64, 64);
+            var gun = {};
+            var pig = {};
+            var goldArr = [];
+            var goldRun = [];
+            var bulletArr = [];
+
+            var bottomL = (oCans.offsetWidth / 2) - (result['bottom'].width);
+
+            gun.x = oCans.offsetWidth / 2;
+            gun.y = oCans.offsetHeight - 70;
+            pig.arcX = result['pig'].width / 2;
+            pig.arcY = (oCans.offsetHeight - result['pig'].height / 2);
+            pig.curPosition = 0.5;
+            oCans.onmouseover = function() {
+                    this.onmousemove = function(ev) {
+                        var oEvent = ev || event;
+                        var iMx = oEvent.layerX;
+                        var iMy = oEvent.layerY;
+                        gun.radian = -(Math.atan2(iMx - gun.x, iMy - gun.y) + Math.PI );
+                        //炮
+                        oGc.save();
+                        oGc.translate(gun.x, gun.y + 32); //设置原点
+                        oGc.rotate(gun.radian);
+                        oGc.drawImage(result['gun'], 0, 0, 64, 64, -32, -32, 64, 64);
+                        oGc.restore();
+                    }
+                    this.onmousedown = function(ev) {
+                        var oEvent = ev || event;
+                        var iCx = oEvent.layerX;
+                        var iCy = oEvent.layerY;
+                        bulletArr.push({
+                            x: gun.x,
+                            y: gun.y,
+                            startX: iCx,
+                            startY: iCy,
+                            iRatio: 0,
+                            radian: gun.radian,
+                            curPosition: 1
+                        });
+                    }
+                }
+                //画
+            DrawingInterval = setInterval(function() {
+                oGc.clearRect(0, 0, oCans.offsetWidth, oCans.offsetHeight);
+                //子弹
+                for (i = 0; i < bulletArr.length; i++) {
+                    var theY = Math.floor(24 - Math.cos(bulletArr[i].radian) * 24 - 10);
+                    var theX = Math.ceil(Math.sin(bulletArr[i].radian) * 24);
+                    var arcX = bulletArr[i].x + theX;
+                    var arcY = bulletArr[i].y + theY;
+                    bulletArr[i].iRatio = (bulletArr[i].startX - arcX) / (bulletArr[i].startY - arcY);
+
+                    oGc.save();
+                    oGc.translate(arcX, arcY); //设置原点
+                    oGc.rotate(bulletArr[i].radian);
+                    oGc.drawImage(result['bullet'], 0, parseInt(bulletArr[i].curPosition) * 48, 30, 48, theX - 15, theY - 24, 30, 48);
+                    oGc.restore();
+                console.log(bulletArr[i].curPosition);
+
+                    bulletArr[i].y -= 6;
+                    bulletArr[i].x -= 6 * bulletArr[i].iRatio.toFixed(2);
+                    bulletArr[i].curPosition += 0.3;
+                    if (bulletArr[i].curPosition > 3) {
+                        bulletArr[i].curPosition = 0;
+                    }
+                    if (bulletArr[i].x <= 0 || bulletArr[i].x >= oCans.offsetWidth || bulletArr[i].y <= 0 || bulletArr[i].y >= oCans.offsetHeight) {
+                        bulletArr.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                //炮
+                oGc.save();
+                oGc.translate(gun.x, gun.y + 32); //设置原点
+                oGc.rotate(gun.radian);
+                oGc.drawImage(result['gun'], 0, 0, 64, 64, -32, -32, 64, 64);
+                oGc.restore();
+                //鱼
+                for (i = 0; i < fishArr.length; i++) {
+
+                    var speedX = 2;
+
+                    if (fishArr[i].type == 1) {
+                        speedX = -2;
+                    }
+                    var speedY = parseFloat(speedX * Math.tan(fishArr[i].radian));
+                    fishArr[i].x = fishArr[i].x + speedX;
+                    fishArr[i].y = fishArr[i].y + speedY;
+
+                    oGc.save();
+                    oGc.translate(fishArr[i].x, fishArr[i].y);
+                    oGc.rotate(fishArr[i].radian);
+                    oGc.drawImage(result[fishArr[i].name], 0, parseInt(fishArr[i].curPosition) * fishArr[i].h, fishArr[i].w, fishArr[i].h, speedX, speedY, fishArr[i].w, fishArr[i].h);
+                    oGc.restore();
+                    fishArr[i].curPosition += fishArr[i].step;
+                    if (fishArr[i].curPosition > fishArr[i].endPoy) {
+                        fishArr[i].curPosition = 0;
+                    }
+                    if (fishArr[i].type == 0 && fishArr[i].x > oCans.offsetWidth) {
+                        fishArr.splice(i, 1);
+                        i--;
+                    } else if (fishArr[i].x < -fishArr[i].w) {
+                        fishArr.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                //打中
+                for (i = 0; i < bulletArr.length; i++) {
+                    for (var n = 0; n < fishArr.length; n++) {
+                        if (collideTest(bulletArr[i].x, bulletArr[i].y, 30, 46, fishArr[n].x, fishArr[n].y, fishArr[n].w, fishArr[n].h)) {
+                            var goldTmp = {
+                                x: fishArr[n].x,
+                                y: fishArr[n].y,
+                                curPosition: 0,
+                            };
+                            integralArr = getInteger(fishArr[n].integral); //设置积分
+                            $('#credits').text(parseFloat(integral));
+                            goldArr.push(goldTmp);
+                            fishArr.splice(n, 1);
+                            bulletArr.splice(i, 1);
+                            i--;
+                            break;
+                        }
+                    }
+                }
+
+                //金币
+                for (i = 0; i < goldArr.length; i++) {
+                    oGc.drawImage(result['gold'], 0, parseInt(goldArr[i].curPosition) * 51, 49, 51, goldArr[i].x, goldArr[i].y, 49, 51);
+                    if (goldArr[i].curPosition >= 5) {
+                        goldRun.push({
+                            curX: goldArr[i].x,
+                            curY: goldArr[i].y,
+                        });
+                        goldArr.splice(i, 1);
+                    } else {
+                        goldArr[i].curPosition += 0.5;
+                    }
+                }
+
+                //金币运动
+                if (pig.curPosition > 0.5) {
+                    pig.curPosition -= 0.08;
+                } else {
+                    pig.curPosition = 0;
+                }
+
+                for (i = 0; i < goldRun.length; i++) {
+                    oGc.drawImage(result['gold'], 0, 0, 49, 51, goldRun[i].curX, goldRun[i].curY, 49, 51);
+                    var speedX = parseInt((pig.arcX - goldRun[i].curX) * 0.2);
+                    var speedY = parseInt((pig.arcY - 20 - goldRun[i].curY) * 0.2);
+                    goldRun[i].curX += speedX;
+                    goldRun[i].curY += speedY;
+                    if (speedX == 0) {
+                        goldRun.splice(i, 1);
+                        i--;
+                        pig.curPosition = 1;
+                    }
+                }
+
+                //pig
+                oGc.drawImage(result['pig'], 0, Math.round(pig.curPosition) * 90, 90, 90, 0, oCans.offsetHeight - 90, 90, 90);
+
+            }, 1000 / 60);
+        });
+
+        var fishArr = [];
+        var arr = [{
+            name: 'fish1',
+            endPoy: 12,
+            step: 0.1,
+            w: 80,
+            h: 80,
+            integral: 2
+        }, {
+            name: 'fish2',
+            endPoy: 8,
+            step: 0.1,
+            w: 60,
+            h: 64,
+            integral: 3
+        }, {
+            name: 'fish3',
+            endPoy: 9,
+            step: 0.1,
+            w: 50,
+            h: 56,
+            integral: 1
+        }]
+
+        var StartGame = setInterval(function() {
+            var rand = Math.round(Math.random() * (arr.length - 1));
+            var iType = Math.round(Math.random() * 1);
+            var tmp = {
+                x: -arr[rand].w,
+                y: oCans.offsetHeight / 2 - 150,
+                radian: (Math.PI / 180) * (parseInt(Math.random() * 60 - 20)),
+                curPosition: 0,
+                step: arr[rand].step,
+                endPoy: arr[rand].endPoy,
+                name: arr[rand].name,
+                w: arr[rand].w,
+                h: arr[rand].h,
+                integral: arr[rand].integral,
+                type: 0
+            };
+            if (iType === 1) {
+
+                tmp.type = 1;
+                tmp.x = oCans.offsetWidth + tmp.w;
+                tmp.name = tmp.name + '_1';
+            }
+            fishArr.push(tmp);
+        }, 800);
+
+        //碰撞检测
+        function collideTest(x1, y1, w1, h1, x2, y2, w2, h2) {
+            var r1 = x1 + w1;
+            var b1 = y1 + h1;
+
+            var r2 = x2 + w2;
+            var b2 = y2 + h2;
+
+            if (x1 > r2 || r1 < x2 || b1 < y2 || y1 > b2) {
+                return false;
+            } else {
+                return true;
+            }
+
+        }
+
+        function getInteger(num) {
+            var integralArr = [];
+            for (var i = 0; i < String(integral).length; i++) {
+                integralArr.push({
+                    old: Number(String(integral)[i]) * 53,
+                    curPosition: 0
+                });
+            }
+            integral = parseFloat(integral) + num;
+            for (i = String(integral).length; i < 6; i++) {
+                integral = '0' + integral;
+            }
+            for (i = 0; i < integralArr.length; i++) {
+                integralArr[i].number = Number(String(integral)[i]) * 53;
+            }
+            return integralArr;
+        }
+
+        //倒计时
+        var time = 60;
+        var Countdown = setInterval(function() {
+            //console.log(time);
+            $('#time').text(time + 'S');
+            if (time == 0) {
+                clearInterval(Countdown);
+                clearInterval(StartGame);
+                clearInterval(DrawingInterval);
+
+                //alert(integral);
+                //location.reload();
+            }
+            time -= 1;
+        }, 1000);
+    }
+    </script>
+</body>
+
+</html>

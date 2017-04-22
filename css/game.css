@@ -1,0 +1,16 @@
+﻿@charset "utf-8";
+/* CSS Document */
+
+#canvas{
+		background:url(../Images/bg.jpg) no-repeat center;
+		background-size: 100% 100%;
+}
+.time{
+	   position: absolute;
+	   color: #fff;
+	}
+.score,.time{width:24%;height:3rem;padding-left:40px;text-align:center;position:fixed;bottom:2rem;}
+.score{line-height:3.5rem;background:url(../Images/jinBNum.png) no-repeat left top;background-size:100% 100%;left:5%;}
+.time{line-height:3.2rem;background:url(../Images/time.png) no-repeat left top;background-size:100% 100%;right:5%;}
+	
+
