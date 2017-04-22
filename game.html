@@ -66,6 +66,9 @@
                         var oEvent = ev || event;
                         var iMx = oEvent.layerX;
                         var iMy = oEvent.layerY;
+
+                        //console.log(iMx+' : '+iMy);
+
                         gun.radian = -(Math.atan2(iMx - gun.x, iMy - gun.y) + Math.PI );
                         //炮
                         oGc.save();
@@ -105,7 +108,8 @@
                     oGc.rotate(bulletArr[i].radian);
                     oGc.drawImage(result['bullet'], 0, parseInt(bulletArr[i].curPosition) * 48, 30, 48, theX - 15, theY - 24, 30, 48);
                     oGc.restore();
-                console.log(bulletArr[i].curPosition);
+
+                	//console.log(bulletArr[i].curPosition);
 
                     bulletArr[i].y -= 6;
                     bulletArr[i].x -= 6 * bulletArr[i].iRatio.toFixed(2);
