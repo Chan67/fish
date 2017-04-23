@@ -64,7 +64,7 @@
 
                         //console.log((iMx - gun.x)+' : '+(iMy - gun.y));
 
-                        gun.radian = Math.atan2(iMy - gun.y, iMx - gun.x) + Math.PI/2;
+                        gun.radian = Math.atan2(iMy - gun.y, iMx - gun.x) + Math.PI / 2;
                         //炮
                         oGc.save();
                         oGc.translate(gun.x, gun.y); //设置原点
@@ -76,7 +76,7 @@
                         var oEvent = ev || event;
                         var iCx = oEvent.layerX;
                         var iCy = oEvent.layerY;
-                    	//console.log(iCx+' : '+iCy);
+                        //console.log(iCx+' : '+iCy);
 
                         bulletArr.push({
                             x: gun.x,
@@ -103,11 +103,11 @@
                     oGc.drawImage(result['bullet'], 0, parseInt(bulletArr[i].curPosition) * 48, 30, 48, -15, -24, 30, 48);
                     oGc.restore();
 
-                	//console.log(bulletArr[i].curPosition);
+                    //console.log(bulletArr[i].curPosition);
 
                     var speed = 6;
-					var speedX = Math.cos(bulletArr[i].radian-Math.PI/2) * speed;
-					var speedY = Math.sin(bulletArr[i].radian-Math.PI/2) * speed;
+                    var speedX = Math.cos(bulletArr[i].radian - Math.PI / 2) * speed;
+                    var speedY = Math.sin(bulletArr[i].radian - Math.PI / 2) * speed;
                     bulletArr[i].x = arcX + speedX;
                     bulletArr[i].y = arcY + speedY;
 
@@ -179,7 +179,7 @@
 
                 //金币
                 for (i = 0; i < goldArr.length; i++) {
-                    oGc.drawImage(result['gold'], 0, parseInt(goldArr[i].curPosition) * 51, 49, 51, goldArr[i].x, goldArr[i].y, 49*0.8, 51*0.8);
+                    oGc.drawImage(result['gold'], 0, parseInt(goldArr[i].curPosition) * 51, 49, 51, goldArr[i].x, goldArr[i].y, 49 * 0.8, 51 * 0.8);
                     if (goldArr[i].curPosition >= 5) {
                         goldRun.push({
                             curX: goldArr[i].x,
@@ -193,17 +193,17 @@
 
 
                 for (i = 0; i < goldRun.length; i++) {
-                    oGc.drawImage(result['gold'], 0, 0, 49, 51, goldRun[i].curX, goldRun[i].curY, 49*0.8, 51*0.8);
+                    oGc.drawImage(result['gold'], 0, 0, 49, 51, goldRun[i].curX, goldRun[i].curY, 49 * 0.8, 51 * 0.8);
                     var speed = 0.2;
-                    var x = oCans.offsetWidth*0.08;
+                    var x = oCans.offsetWidth * 0.08;
                     // console.log(120/oCans.offsetWidth)
                     var y = oCans.offsetHeight - 100;
-                    var speedX = parseInt(x - goldRun[i].curX)*speed;
+                    var speedX = parseInt(x - goldRun[i].curX) * speed;
                     // var speedY = parseInt(867 - goldRun[i].curY)*speed;
-                    var k = (y - goldRun[i].curY)/(x - goldRun[i].curX);
-                    
+                    var k = (y - goldRun[i].curY) / (x - goldRun[i].curX);
+
                     goldRun[i].curX += speedX;
-                    goldRun[i].curY = k*(goldRun[i].curX - x) + y;
+                    goldRun[i].curY = k * (goldRun[i].curX - x) + y;
 
                     //console.log(goldRun[i].curY/goldRun[i].curX);
                     if (speedX == 0) {
@@ -266,18 +266,27 @@
 
         //碰撞检测
         function collideTest(x1, y1, w1, h1, x2, y2, w2, h2) {
-            var r1 = x1 + w1;
-            var b1 = y1 + h1;
 
-            var r2 = x2 + w2;
-            var b2 = y2 + h2;
+            // var r1 = x1 + w1;
+            // var b1 = y1 + h1;
 
-            if (x1 > r2 || r1 < x2 || b1 < y2 || y1 > b2) {
-                return false;
-            } else {
+            // var r2 = x2 + w2;
+            // var b2 = y2 + h2;
+
+            // if (x1 > r2 || r1 < x2 || b1 < y2 || y1 > b2) {
+            //     return false;
+            // } else {
+            //     return true;
+            // }
+            // var dist = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+            // console.log(Math.sqrt(w1*w1+h1*h1)/2 + Math.sqrt(w2*w2+h2*h2)/2);
+            var dist = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+            var r = Math.sqrt(w1 * w1 + h1 * h1) / 2 + Math.sqrt(w2 * w2 + h2 * h2) / 2;
+            if (dist <= r) {
                 return true;
+            } else {
+                return false;
             }
-
         }
 
         function getInteger(num) {
