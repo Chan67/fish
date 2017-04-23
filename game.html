@@ -67,7 +67,7 @@
                         var iMx = oEvent.layerX;
                         var iMy = oEvent.layerY;
 
-                        console.log((iMx - gun.x)+' : '+(iMy - gun.y));
+                        //console.log((iMx - gun.x)+' : '+(iMy - gun.y));
 
                         gun.radian = Math.atan2(iMy - gun.y, iMx - gun.x) + Math.PI/2;
                         //炮
@@ -99,6 +99,9 @@
                 for (i = 0; i < bulletArr.length; i++) {
                     var theY = Math.floor(24 - Math.cos(bulletArr[i].radian) * 24 - 10);
                     var theX = Math.ceil(Math.sin(bulletArr[i].radian) * 24);
+
+                    //console.log(theX+' : '+theY);
+
                     var arcX = bulletArr[i].x + theX;
                     var arcY = bulletArr[i].y + theY;
                     bulletArr[i].iRatio = (bulletArr[i].startX - arcX) / (bulletArr[i].startY - arcY);
