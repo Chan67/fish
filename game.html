@@ -16,7 +16,6 @@
     </canvas>
     <div id="credits" class="score">0</div>
     <div id="time" class="time">加载..</div>
-    
     <script>
     function loadImg(arr, fn) {
         var result = {};
@@ -45,11 +44,11 @@
         oCans.height = curH - 5;
         var DrawingInterval;
         var oGc = oCans.getContext('2d');
-        loadImg(['pig.png', 'gun.png', 'bullet.png', 'gold.png', 'fish1.png', 'fish1_1.png', 'fish2.png', 'fish2_1.png', 'fish3.png', 'fish3_1.png', 'integer.png', 'bottom.jpg'], function(result) {
+        loadImg(['gun.png', 'bullet.png', 'gold.png', 'fish1.png', 'fish1_1.png', 'fish2.png', 'fish2_1.png', 'fish3.png', 'fish3_1.png', 'integer.png', 'bottom.jpg'], function(result) {
             //炮的运动
             oGc.drawImage(result['gun'], 0, 0, 64, 64, oCans.offsetWidth / 2 - 32, oCans.offsetHeight - 64, 64, 64);
             var gun = {};
-            var pig = {};
+
             var goldArr = [];
             var goldRun = [];
             var bulletArr = [];
@@ -58,9 +57,7 @@
 
             gun.x = oCans.offsetWidth / 2;
             gun.y = oCans.offsetHeight - 32;
-            pig.arcX = result['pig'].width / 2;
-            pig.arcY = (oCans.offsetHeight - result['pig'].height / 2);
-            pig.curPosition = 0.5;
+
             oCans.onmouseover = function() {
                     this.onmousemove = function(ev) {
                         var oEvent = ev || event;
@@ -81,6 +78,8 @@
                         var oEvent = ev || event;
                         var iCx = oEvent.layerX;
                         var iCy = oEvent.layerY;
+                    	//console.log(iCx+' : '+iCy);
+
                         bulletArr.push({
                             x: gun.x,
                             y: gun.y,
@@ -182,7 +181,7 @@
 
                 //金币
                 for (i = 0; i < goldArr.length; i++) {
-                    oGc.drawImage(result['gold'], 0, parseInt(goldArr[i].curPosition) * 51, 49, 51, goldArr[i].x, goldArr[i].y, 49, 51);
+                    oGc.drawImage(result['gold'], 0, parseInt(goldArr[i].curPosition) * 51, 49, 51, goldArr[i].x, goldArr[i].y, 49*0.8, 51*0.8);
                     if (goldArr[i].curPosition >= 5) {
                         goldRun.push({
                             curX: goldArr[i].x,
@@ -194,28 +193,26 @@
                     }
                 }
 
-                //金币运动
-                if (pig.curPosition > 0.5) {
-                    pig.curPosition -= 0.08;
-                } else {
-                    pig.curPosition = 0;
-                }
 
                 for (i = 0; i < goldRun.length; i++) {
-                    oGc.drawImage(result['gold'], 0, 0, 49, 51, goldRun[i].curX, goldRun[i].curY, 49, 51);
-                    var speedX = parseInt((pig.arcX - goldRun[i].curX) * 0.2);
-                    var speedY = parseInt((pig.arcY - 20 - goldRun[i].curY) * 0.2);
+                    oGc.drawImage(result['gold'], 0, 0, 49, 51, goldRun[i].curX, goldRun[i].curY, 49*0.8, 51*0.8);
+                    var speed = 0.2;
+                    var x = oCans.offsetWidth*0.08;
+                    // console.log(120/oCans.offsetWidth)
+                    var y = oCans.offsetHeight - 100;
+                    var speedX = parseInt(x - goldRun[i].curX)*speed;
+                    // var speedY = parseInt(867 - goldRun[i].curY)*speed;
+                    var k = (y - goldRun[i].curY)/(x - goldRun[i].curX);
+                    
                     goldRun[i].curX += speedX;
-                    goldRun[i].curY += speedY;
+                    goldRun[i].curY = k*(goldRun[i].curX - x) + y;
+
+                    //console.log(goldRun[i].curY/goldRun[i].curX);
                     if (speedX == 0) {
                         goldRun.splice(i, 1);
                         i--;
-                        pig.curPosition = 1;
                     }
                 }
-
-                //pig
-                oGc.drawImage(result['pig'], 0, Math.round(pig.curPosition) * 90, 90, 90, 0, oCans.offsetHeight - 90, 90, 90);
 
             }, 1000 / 60);
         });
