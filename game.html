@@ -67,9 +67,9 @@
                         var iMx = oEvent.layerX;
                         var iMy = oEvent.layerY;
 
-                        //console.log(iMx+' : '+iMy);
+                        console.log((iMx - gun.x)+' : '+(iMy - gun.y));
 
-                        gun.radian = -(Math.atan2(iMx - gun.x, iMy - gun.y) + Math.PI );
+                        gun.radian = Math.atan2(iMy - gun.y, iMx - gun.x) + Math.PI/2;
                         //炮
                         oGc.save();
                         oGc.translate(gun.x, gun.y + 32); //设置原点
@@ -137,13 +137,13 @@
                     if (fishArr[i].type == 1) {
                         speedX = -2;
                     }
-                    var speedY = parseFloat(speedX * Math.tan(fishArr[i].radian));
+                    var speedY = parseFloat(speedX * Math.tan(fishArr[i].angle));
                     fishArr[i].x = fishArr[i].x + speedX;
                     fishArr[i].y = fishArr[i].y + speedY;
 
                     oGc.save();
                     oGc.translate(fishArr[i].x, fishArr[i].y);
-                    oGc.rotate(fishArr[i].radian);
+                    oGc.rotate(fishArr[i].angle);
                     oGc.drawImage(result[fishArr[i].name], 0, parseInt(fishArr[i].curPosition) * fishArr[i].h, fishArr[i].w, fishArr[i].h, speedX, speedY, fishArr[i].w, fishArr[i].h);
                     oGc.restore();
                     fishArr[i].curPosition += fishArr[i].step;
@@ -249,7 +249,7 @@
             var tmp = {
                 x: -arr[rand].w,
                 y: oCans.offsetHeight / 2 - 150,
-                radian: (Math.PI / 180) * (parseInt(Math.random() * 60 - 20)),
+                angle: (Math.PI / 180) * (parseInt(Math.random() * 60 - 20)),
                 curPosition: 0,
                 step: arr[rand].step,
                 endPoy: arr[rand].endPoy,
