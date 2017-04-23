@@ -47,7 +47,7 @@
         var oGc = oCans.getContext('2d');
         loadImg(['pig.png', 'gun.png', 'bullet.png', 'gold.png', 'fish1.png', 'fish1_1.png', 'fish2.png', 'fish2_1.png', 'fish3.png', 'fish3_1.png', 'integer.png', 'bottom.jpg'], function(result) {
             //炮的运动
-            oGc.drawImage(result['gun'], 0, 0, 64, 64, oCans.offsetWidth / 2 - 32, oCans.offsetHeight - 70, 64, 64);
+            oGc.drawImage(result['gun'], 0, 0, 64, 64, oCans.offsetWidth / 2 - 32, oCans.offsetHeight - 64, 64, 64);
             var gun = {};
             var pig = {};
             var goldArr = [];
@@ -57,7 +57,7 @@
             var bottomL = (oCans.offsetWidth / 2) - (result['bottom'].width);
 
             gun.x = oCans.offsetWidth / 2;
-            gun.y = oCans.offsetHeight - 70;
+            gun.y = oCans.offsetHeight - 32;
             pig.arcX = result['pig'].width / 2;
             pig.arcY = (oCans.offsetHeight - result['pig'].height / 2);
             pig.curPosition = 0.5;
@@ -72,7 +72,7 @@
                         gun.radian = Math.atan2(iMy - gun.y, iMx - gun.x) + Math.PI/2;
                         //炮
                         oGc.save();
-                        oGc.translate(gun.x, gun.y + 32); //设置原点
+                        oGc.translate(gun.x, gun.y); //设置原点
                         oGc.rotate(gun.radian);
                         oGc.drawImage(result['gun'], 0, 0, 64, 64, -32, -32, 64, 64);
                         oGc.restore();
@@ -86,7 +86,6 @@
                             y: gun.y,
                             startX: iCx,
                             startY: iCy,
-                            iRatio: 0,
                             radian: gun.radian,
                             curPosition: 1
                         });
@@ -97,25 +96,24 @@
                 oGc.clearRect(0, 0, oCans.offsetWidth, oCans.offsetHeight);
                 //子弹
                 for (i = 0; i < bulletArr.length; i++) {
-                    var theY = Math.floor(24 - Math.cos(bulletArr[i].radian) * 24 - 10);
-                    var theX = Math.ceil(Math.sin(bulletArr[i].radian) * 24);
-
-                    //console.log(theX+' : '+theY);
-
-                    var arcX = bulletArr[i].x + theX;
-                    var arcY = bulletArr[i].y + theY;
-                    bulletArr[i].iRatio = (bulletArr[i].startX - arcX) / (bulletArr[i].startY - arcY);
+                    var arcX = bulletArr[i].x;
+                    var arcY = bulletArr[i].y;
+                    //console.log(arcX+' : '+arcY);
 
                     oGc.save();
                     oGc.translate(arcX, arcY); //设置原点
                     oGc.rotate(bulletArr[i].radian);
-                    oGc.drawImage(result['bullet'], 0, parseInt(bulletArr[i].curPosition) * 48, 30, 48, theX - 15, theY - 24, 30, 48);
+                    oGc.drawImage(result['bullet'], 0, parseInt(bulletArr[i].curPosition) * 48, 30, 48, -15, -24, 30, 48);
                     oGc.restore();
 
                 	//console.log(bulletArr[i].curPosition);
 
-                    bulletArr[i].y -= 6;
-                    bulletArr[i].x -= 6 * bulletArr[i].iRatio.toFixed(2);
+                    var speed = 6;
+					var speedX = Math.cos(bulletArr[i].radian-Math.PI/2) * speed;
+					var speedY = Math.sin(bulletArr[i].radian-Math.PI/2) * speed;
+                    bulletArr[i].x = arcX + speedX;
+                    bulletArr[i].y = arcY + speedY;
+
                     bulletArr[i].curPosition += 0.3;
                     if (bulletArr[i].curPosition > 3) {
                         bulletArr[i].curPosition = 0;
@@ -128,7 +126,7 @@
 
                 //炮
                 oGc.save();
-                oGc.translate(gun.x, gun.y + 32); //设置原点
+                oGc.translate(gun.x, gun.y); //设置原点
                 oGc.rotate(gun.radian);
                 oGc.drawImage(result['gun'], 0, 0, 64, 64, -32, -32, 64, 64);
                 oGc.restore();
