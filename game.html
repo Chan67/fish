@@ -76,7 +76,7 @@
                         var oEvent = ev || event;
                         var iCx = oEvent.layerX;
                         var iCy = oEvent.layerY;
-                        //console.log(iCx+' : '+iCy);
+                        console.log(iCx + ' : ' + iCy);
 
                         bulletArr.push({
                             x: gun.x,
@@ -135,13 +135,14 @@
                     if (fishArr[i].type == 1) {
                         speedX = -2;
                     }
-                    var speedY = parseFloat(speedX * Math.tan(fishArr[i].angle));
+                    var speedY = parseFloat(speedX * Math.tan(fishArr[i].radian));
+
                     fishArr[i].x = fishArr[i].x + speedX;
                     fishArr[i].y = fishArr[i].y + speedY;
 
                     oGc.save();
                     oGc.translate(fishArr[i].x, fishArr[i].y);
-                    oGc.rotate(fishArr[i].angle);
+                    oGc.rotate(fishArr[i].radian);
                     oGc.drawImage(result[fishArr[i].name], 0, parseInt(fishArr[i].curPosition) * fishArr[i].h, fishArr[i].w, fishArr[i].h, speedX, speedY, fishArr[i].w, fishArr[i].h);
                     oGc.restore();
                     fishArr[i].curPosition += fishArr[i].step;
@@ -245,7 +246,7 @@
             var tmp = {
                 x: -arr[rand].w,
                 y: oCans.offsetHeight / 2 - 150,
-                angle: (Math.PI / 180) * (parseInt(Math.random() * 60 - 20)),
+                radian: (Math.PI / 180) * (parseInt(Math.random() * 60 - 20)),
                 curPosition: 0,
                 step: arr[rand].step,
                 endPoy: arr[rand].endPoy,
@@ -278,11 +279,16 @@
             // } else {
             //     return true;
             // }
+
             // var dist = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
             // console.log(Math.sqrt(w1*w1+h1*h1)/2 + Math.sqrt(w2*w2+h2*h2)/2);
-            var dist = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+
+            var x = x1 - (x2 + w2 / 2);
+            var y = y1 - (y2 + h2 / 2);
+            var dist = Math.sqrt(x * x + y * y);
             var r = Math.sqrt(w1 * w1 + h1 * h1) / 2 + Math.sqrt(w2 * w2 + h2 * h2) / 2;
-            if (dist <= r) {
+
+            if (dist < r / 2) {
                 return true;
             } else {
                 return false;
@@ -316,7 +322,7 @@
                 clearInterval(Countdown);
                 clearInterval(StartGame);
                 clearInterval(DrawingInterval);
-
+                alert('Over');
                 //alert(integral);
                 //location.reload();
             }
